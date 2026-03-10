@@ -1,0 +1,111 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  deploy-frontend:
+    name: Frontend → ${{ github.ref_name == 'main' && 'Production (nexiumtrio.com.au)' || 'Staging (staging.nexiumtrio.com.au)' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    if: |
+      contains(toJson(github.event.commits), 'apps/frontend') ||
+      contains(toJson(github.event.commits), 'package.json') ||
+      contains(toJson(github.event.commits), 'nx.json') ||
+      contains(toJson(github.event.commits), 'tsconfig.base.json')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npx nx build frontend --configuration=production
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: dist/apps/frontend
+          vercel-args: '--prod'
+          alias-domains: ${{ secrets.VERCEL_ALIAS_DOMAIN }}
+
+  deploy-backend:
+    name: Backend → ${{ github.ref_name == 'main' && 'Production (api.nexiumtrio.com.au)' || 'Staging (api.staging.nexiumtrio.com.au)' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    if: |
+      contains(toJson(github.event.commits), 'apps/backend')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, sqlite3, pdo, pdo_mysql
+          coverage: none
+
+      - name: Install Composer dependencies (production only)
+        working-directory: apps/backend
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Sync files to server via rsync over SSH
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: >-
+            -avzr
+            --delete
+            --exclude='.env'
+            --exclude='.git'
+            --exclude='storage/logs/*.log'
+            --exclude='storage/framework/sessions/*'
+            --exclude='storage/framework/views/*'
+            --exclude='storage/framework/cache/data/*'
+            --exclude='database/database.sqlite'
+          path: apps/backend/
+          remote_path: ${{ secrets.FASTCOMET_REMOTE_PATH }}
+          remote_host: ${{ secrets.FASTCOMET_HOST }}
+          remote_user: ${{ secrets.FASTCOMET_USERNAME }}
+          remote_key: ${{ secrets.FASTCOMET_SSH_KEY }}
+          remote_port: ${{ secrets.FASTCOMET_PORT }}
+
+      - name: Run post-deploy commands via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FASTCOMET_HOST }}
+          username: ${{ secrets.FASTCOMET_USERNAME }}
+          key: ${{ secrets.FASTCOMET_SSH_KEY }}
+          port: ${{ secrets.FASTCOMET_PORT }}
+          script: |
+            set -e
+            cd ${{ secrets.FASTCOMET_REMOTE_PATH }}
+
+            echo ">>> Setting permissions..."
+            chmod -R 775 storage bootstrap/cache
+
+            echo ">>> Running migrations..."
+            php artisan migrate --force
+
+            echo ">>> Caching config & routes..."
+            php artisan optimize
+
+            echo ">>> Linking storage..."
+            php artisan storage:link --force
+
+            echo ">>> Deployment complete."
