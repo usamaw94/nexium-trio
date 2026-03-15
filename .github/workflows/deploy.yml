@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: Build frontend
-        run: npx nx build frontend --configuration=production
+        run: npx nx build frontend
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
