@@ -5,12 +5,30 @@ on:
     branches:
       - main
       - staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      app:
+        description: 'App to deploy'
+        required: true
+        type: choice
+        options:
+          - frontend
+          - backend
+          - both
 
 jobs:
   deploy-frontend:
-    name: Frontend → ${{ github.ref_name == 'main' && 'Production (nexiumtrio.com.au)' || 'Staging (staging.nexiumtrio.com.au)' }}
+    name: Frontend → ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && 'Production (nexiumtrio.com.au)' || 'Staging (staging.nexiumtrio.com.au)' }}
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.app == 'frontend' || github.event.inputs.app == 'both' }}
 
     steps:
       - name: Checkout code
@@ -26,27 +44,28 @@ jobs:
         run: npm ci
 
       - name: Pull Vercel project settings
-        run: npx vercel pull --yes --environment=${{ github.ref_name == 'main' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel pull --yes --environment=${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build project
-        run: npx vercel build ${{ github.ref_name == 'main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel build ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy to Vercel
-        run: npx vercel deploy --prebuilt ${{ github.ref_name == 'main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel deploy --prebuilt ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
   deploy-backend:
-    name: Backend → ${{ github.ref_name == 'main' && 'Production (api.nexiumtrio.com.au)' || 'Staging (api.staging.nexiumtrio.com.au)' }}
+    name: Backend → ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && 'Production (api.nexiumtrio.com.au)' || 'Staging (api.staging.nexiumtrio.com.au)' }}
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.app == 'backend' || github.event.inputs.app == 'both' }}
 
     steps:
       - name: Checkout code
