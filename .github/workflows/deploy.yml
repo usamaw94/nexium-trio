@@ -11,11 +11,6 @@ jobs:
     name: Frontend → ${{ github.ref_name == 'main' && 'Production (nexiumtrio.com.au)' || 'Staging (staging.nexiumtrio.com.au)' }}
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-    if: |
-      contains(toJson(github.event.commits), 'apps/frontend') ||
-      contains(toJson(github.event.commits), 'package.json') ||
-      contains(toJson(github.event.commits), 'nx.json') ||
-      contains(toJson(github.event.commits), 'tsconfig.base.json')
 
     steps:
       - name: Checkout code
@@ -47,8 +42,6 @@ jobs:
     name: Backend → ${{ github.ref_name == 'main' && 'Production (api.nexiumtrio.com.au)' || 'Staging (api.staging.nexiumtrio.com.au)' }}
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-    if: |
-      contains(toJson(github.event.commits), 'apps/backend')
 
     steps:
       - name: Checkout code
