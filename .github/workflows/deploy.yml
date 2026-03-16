@@ -88,6 +88,7 @@ jobs:
           switches: >-
             -avzr
             --delete
+            -e "ssh -p ${{ secrets.FASTCOMET_PORT }}"
             --exclude='.env'
             --exclude='.git'
             --exclude='storage/logs/*.log'
@@ -100,7 +101,6 @@ jobs:
           remote_host: ${{ secrets.FASTCOMET_HOST }}
           remote_user: ${{ secrets.FASTCOMET_USERNAME }}
           remote_key: ${{ secrets.FASTCOMET_SSH_KEY }}
-          remote_port: ${{ secrets.FASTCOMET_PORT }}
 
       - name: Run post-deploy commands via SSH
         uses: appleboy/ssh-action@v1.0.3
