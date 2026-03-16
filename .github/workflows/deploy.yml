@@ -114,6 +114,7 @@ jobs:
             cd ${{ secrets.FASTCOMET_REMOTE_PATH }}
 
             echo ">>> Setting permissions..."
+            mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
             chmod -R 775 storage bootstrap/cache
 
             echo ">>> Running migrations..."
