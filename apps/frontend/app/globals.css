@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Custom font utilities — Figma se match karne ke liye */
+@utility font-montserrat {
+  font-family: var(--font-montserrat);
+}
+
+@utility font-josefin {
+  font-family: var(--font-josefin);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-25%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  color: #1e5a5d;
+  caret-color: #1e5a5d;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: #1e5a5d;
+}
+
