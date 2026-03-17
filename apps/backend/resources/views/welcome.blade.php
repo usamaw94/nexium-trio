@@ -7,6 +7,6 @@
     </head>
     <body>
         <h1>{{ config('app.name', 'Nexium Trio') }} — Backend</h1>
-        <p>Laravel is running. Visit <a href="/api/health">/api/health</a> to check the API.</p>
+        <p>NexiumTrio is running. Visit <a href="/api/health">/api/health</a> to check the API.</p>
     </body>
 </html>

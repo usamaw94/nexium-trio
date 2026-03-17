@@ -6,7 +6,7 @@ import NxWelcome from './nx-welcome';
 export function App() {
   return (
     <div>
-      <NxWelcome title="Nexium Trio" />
+      <NxWelcome title="Nexium Trio Front End" />
     </div>
   );
 }
