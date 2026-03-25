@@ -1,6 +1,6 @@
 # Nexium Trio
 
-A monorepo managed by [Nx](https://nx.dev) containing a React frontend and a Laravel backend.
+A monorepo managed by [Nx](https://nx.dev) containing a Next.js frontend and a Laravel backend.
 
 ---
 
@@ -44,7 +44,7 @@ npx nx run backend:migrate
 **Step 5 — Start both apps:**
 ```bash
 # Terminal 1
-npx nx serve frontend        # http://localhost:4200
+npx nx serve frontend        # http://localhost:3000
 
 # Terminal 2
 npx nx run backend:serve     # http://localhost:8000
@@ -57,19 +57,15 @@ npx nx run backend:serve     # http://localhost:8000
 ```
 nexium-trio/                        ← Nx workspace root
 ├── apps/
-│   ├── frontend/                   ← React application (Vite + TypeScript)
+│   ├── frontend/                   ← Next.js application (TypeScript)
 │   │   ├── src/
-│   │   │   ├── app/
-│   │   │   │   ├── app.tsx         ← Root React component
-│   │   │   │   └── app.module.css
-│   │   │   ├── assets/
-│   │   │   ├── main.tsx            ← Entry point
-│   │   │   └── styles.css
+│   │   │   └── app/
+│   │   │       ├── layout.tsx      ← Root layout
+│   │   │       └── page.tsx        ← Home page
 │   │   ├── public/
-│   │   │   └── vercel.json         ← SPA routing config for Vercel
-│   │   ├── index.html
-│   │   ├── vite.config.ts
+│   │   ├── next.config.js
 │   │   ├── tsconfig.json
+│   │   ├── package.json            ← Frontend-specific dependencies
 │   │   └── project.json            ← Nx project config
 │   │
 │   └── backend/                    ← Laravel application (PHP 8.4+)
@@ -119,8 +115,7 @@ nexium-trio/                        ← Nx workspace root
 
 | Layer    | Technology   | Version |
 |----------|--------------|---------|
-| Frontend | React        | 18.x    |
-| Frontend | Vite         | 4.x     |
+| Frontend | Next.js      | 14.x    |
 | Frontend | TypeScript   | 5.x     |
 | Backend  | Laravel      | 11.x    |
 | Backend  | PHP          | 8.4+    |
@@ -275,11 +270,11 @@ DB_PASSWORD=your_password
 
 ## Running the Applications
 
-### Frontend (React)
+### Frontend (Next.js)
 ```bash
 npx nx serve frontend
 ```
-Runs the Vite dev server at **http://localhost:4200** with hot module replacement.
+Runs the Next.js dev server at **http://localhost:3000**.
 
 ### Backend (Laravel)
 ```bash
@@ -293,6 +288,8 @@ Open two terminal windows and run each serve command, or use a process manager l
 npx concurrently "npx nx serve frontend" "npx nx run backend:serve"
 ```
 
+> **Note:** The frontend has its own `package.json` in `apps/frontend/`. The `serve` and `build` targets automatically run `npm install` inside that directory before starting.
+
 ---
 
 ## Building for Production
@@ -301,7 +298,7 @@ npx concurrently "npx nx serve frontend" "npx nx run backend:serve"
 ```bash
 npx nx build frontend
 ```
-Output is generated in `dist/apps/frontend/`.
+Output is generated in `apps/frontend/.next/`.
 
 ### Optimize backend for production
 ```bash
@@ -313,7 +310,7 @@ npx nx run backend:optimize
 
 ## Testing
 
-### Frontend tests (Vitest)
+### Frontend tests (Jest)
 ```bash
 npx nx test frontend
 ```
@@ -486,9 +483,10 @@ php artisan migrate
 1. Go to [vercel.com](https://vercel.com) → New Project → import `usamaw94/nexium-trio`
 2. Set:
    - **Root Directory**: _(leave empty)_
-   - **Build Command**: `npx nx build frontend`
-   - **Output Directory**: `dist/apps/frontend`
-   - **Install Command**: `npm ci`
+   - **Framework**: Next.js
+   - **Build Command**: `next build`
+   - **Output Directory**: `.next`
+   - **Install Command**: `npm install`
 3. Go to **Project Settings → Domains** and add:
    - `nexiumtrio.com.au` → Production
    - `www.nexiumtrio.com.au` → Production
@@ -549,10 +547,9 @@ Go to **GitHub → Actions → Deploy → Run workflow**:
 ### How the pipeline works
 
 **`deploy-frontend` job:**
-- Runs `vercel pull` to fetch project settings
-- Runs `vercel build` which executes `npx nx build frontend` and packages output
-- Runs `vercel deploy --prebuilt` to upload the build to Vercel
-- `apps/frontend/public/vercel.json` enables SPA routing for React Router
+- Runs `vercel pull --cwd apps/frontend` to fetch project settings
+- Runs `vercel build --cwd apps/frontend` which runs `next build` and packages the `.next` output
+- Runs `vercel deploy --prebuilt --cwd apps/frontend` to upload the build to Vercel
 
 **`deploy-backend` job:**
 - Installs Composer dependencies (`--no-dev --optimize-autoloader`)
@@ -651,13 +648,12 @@ npx nx run-many -t lint
 
 ### Frontend (`apps/frontend`)
 
-| Target    | Command                   | Description                                  |
-|-----------|---------------------------|----------------------------------------------|
-| `serve`   | `npx nx serve frontend`   | Start Vite dev server with HMR               |
-| `build`   | `npx nx build frontend`   | Build for production to `dist/apps/frontend` |
-| `preview` | `npx nx preview frontend` | Preview the production build locally         |
-| `test`    | `npx nx test frontend`    | Run unit tests with Vitest                   |
-| `lint`    | `npx nx lint frontend`    | Lint with ESLint                             |
+| Target  | Command                 | Description                               |
+|---------|-------------------------|-------------------------------------------|
+| `serve` | `npx nx serve frontend` | Start Next.js dev server at port 3000     |
+| `build` | `npx nx build frontend` | Build for production to `apps/frontend/.next` |
+| `start` | `npx nx start frontend` | Start production server (after build)     |
+| `lint`  | `npx nx lint frontend`  | Lint with Next.js ESLint config           |
 
 ### Backend (`apps/backend`)
 
