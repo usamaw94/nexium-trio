@@ -36,23 +36,27 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: apps/frontend
+
       - name: Pull Vercel project settings
-        run: npx vercel pull --yes --environment=${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel pull --yes --cwd apps/frontend --environment=${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build project
-        run: npx vercel build ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel build --cwd apps/frontend ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy to Vercel
-        run: npx vercel deploy --prebuilt ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel deploy --prebuilt --cwd apps/frontend ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
