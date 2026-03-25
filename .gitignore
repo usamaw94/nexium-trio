@@ -52,3 +52,5 @@ apps/backend/storage/framework/views/*
 apps/backend/storage/app/public/*
 apps/backend/bootstrap/cache/*.php
 apps/backend/database/database.sqlite
+
+frontend.zip
