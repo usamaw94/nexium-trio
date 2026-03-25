@@ -56,7 +56,17 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy to Vercel
-        run: npx vercel deploy --prebuilt --cwd apps/frontend ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          DEPLOYMENT_URL=$(npx vercel deploy --prebuilt --cwd apps/frontend ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Alias to staging domain
+        if: ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'staging' }}
+        run: npx vercel alias set ${{ steps.deploy.outputs.deployment_url }} staging.nexiumtrio.com.au --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
