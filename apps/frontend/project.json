@@ -7,14 +7,14 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next build",
+        "command": "npm install && next build",
         "cwd": "apps/frontend"
       }
     },
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next dev",
+        "command": "npm install && next dev",
         "cwd": "apps/frontend"
       }
     },
