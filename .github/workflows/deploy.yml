@@ -56,16 +56,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy to Vercel
-        id: deploy
-        run: |
-          DEPLOY_URL=$(npx vercel deploy --prebuilt --cwd apps/frontend ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Alias deployment to domain
-        run: npx vercel alias set ${{ steps.deploy.outputs.url }} ${{ secrets.VERCEL_ALIAS_DOMAIN }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel deploy --prebuilt --cwd apps/frontend ${{ (github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging')) == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
