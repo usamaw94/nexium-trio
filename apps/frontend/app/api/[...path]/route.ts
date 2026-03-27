@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND =
   process.env.BACKEND_URL ||
-  'https://staging.nexiumtrio.com.au/api/';
+   'https://staging.nexiumtrio.com.au/api/';
 
 async function handler(
   req: NextRequest,
