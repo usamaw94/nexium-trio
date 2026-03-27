@@ -1,6 +1,6 @@
 const API_URL = '';
 const TOKEN_STORAGE_KEY = 'nexium_admin_token';
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://affectionate-magenta-kangaroo.39-61-46-46.cpanel.site/api';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.nexiumtrio.com.au/api/';
 const STORAGE_BASE = BACKEND_URL.replace(/\/api$/, '');
 
 export function getStorageUrl(path: string | null | undefined): string {

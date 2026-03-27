@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'affectionate-magenta-kangaroo.39-61-46-46.cpanel.site',
+        hostname: 'staging.nexiumtrio.com.au',
         pathname: '/**',
         
         

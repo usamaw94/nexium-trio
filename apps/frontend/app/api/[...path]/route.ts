@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND =
   process.env.BACKEND_URL ||
-  'https://affectionate-magenta-kangaroo.39-61-46-46.cpanel.site/api';
+  'https://staging.nexiumtrio.com.au/api/';
 
 async function handler(
   req: NextRequest,
