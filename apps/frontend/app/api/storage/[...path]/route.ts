@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.nexiumtrio.com.au/api'
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.api.nexiumtrio.com.au/api/'
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
