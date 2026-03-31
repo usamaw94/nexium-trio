@@ -1,4 +1,4 @@
-const API_URL = '';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://staging.api.nexiumtrio.com.au/api/').replace(/\/api\/?$/, '');
 
 export interface AuthUser {
   id: number;
