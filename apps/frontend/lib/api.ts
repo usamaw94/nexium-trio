@@ -1,7 +1,7 @@
-const API_URL = '';
 const TOKEN_STORAGE_KEY = 'nexium_admin_token';
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.api.nexiumtrio.com.au/api/';
-const STORAGE_BASE = BACKEND_URL.replace(/\/api$/, '');
+const API_URL = BACKEND_URL.replace(/\/api\/?$/, '');
+
 
 export function getStorageUrl(path: string | null | undefined): string {
   if (!path) return '';
