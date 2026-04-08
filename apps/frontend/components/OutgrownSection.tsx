@@ -24,7 +24,7 @@ export default function OutgrownSection() {
                 lineHeight: "30px",
               }}
             >
-              We work with businesses that are scaling fast, evolving their digital presence, or rethinking their current offer. Whether you're replacing your existing workflows or building something from scratch, we designand develop custom platforms that support your goals.
+              We work with businesses that are scaling fast, evolving their digital presence, or rethinking their current offer. Whether you're replacing your existing workflows or building something from scratch, we designand develop custom platforms that support your goals (testing).
             </p>
             <motion.div
               className="hidden lg:block absolute -top-15 -right-16 opacity-80"
