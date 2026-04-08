@@ -79,7 +79,7 @@ export default function Home() {
       />
 
       <LandingHeroSection
-        heading="DIGITAL SOLUTIONS THAT DRIVE BUSINESS - TESTING"
+        heading="DIGITAL SOLUTIONS THAT DRIVE BUSINESS"
         description="We're a Melbourne-based team of full-stack developers specialising in Shopify, WordPress, Laravel, and React.js. Whether you're scaling fast, replatforming, or building from scratch - we turn complex requirements into high-performing digital platforms."
         buttonText="GET A QUOTE"
         buttonLink="/contact-us"
